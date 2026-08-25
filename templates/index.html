@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess2Video - Premium Chess Video Generator</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            purple: '#8b5cf6',
+                            blue: '#3b82f6',
+                            cyan: '#06b6d4',
+                            pink: '#ec4899',
+                            dark: '#050409',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #07050d 0%, #0d0a1b 40%, #050408 100%);
+            min-height: 100vh;
+            color: #f3f4f6;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.01);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 9999px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.16);
+        }
+        /* Glassmorphism utility */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .glow-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .glow-button::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+            transition: all 0.6s ease;
+        }
+        .glow-button:hover::after {
+            left: 100%;
+        }
+    </style>
+</head>
+<body class="font-sans antialiased overflow-x-hidden">
+
+    <!-- Premium Glowing Background Orbs -->
+    <div class="absolute top-[-15%] left-[-15%] w-[60%] h-[60%] bg-brand-purple/8 blur-[180px] rounded-full pointer-events-none"></div>
+    <div class="absolute bottom-[-15%] right-[-15%] w-[60%] h-[60%] bg-brand-cyan/8 blur-[180px] rounded-full pointer-events-none"></div>
+
+    <div class="max-w-6xl mx-auto px-6 py-12 relative z-10">
+        <!-- Header -->
+        <header class="text-center mb-16">
+            <div class="inline-flex items-center justify-center space-x-3 mb-4">
+                <!-- SVG Studio Icon instead of Emoji -->
+                <svg class="w-10 h-10 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                </svg>
+                <h1 class="text-5xl font-extrabold tracking-tight bg-gradient-to-r from-brand-cyan via-brand-purple to-brand-pink bg-clip-text text-transparent drop-shadow-lg">
+                    Chess2Video
+                </h1>
+            </div>
+            <p class="text-gray-400 text-lg font-light max-w-2xl mx-auto leading-relaxed">
+                Convert your PGN chess games into professional landscape or vertical videos with smooth piece transitions, synchronized audio effects, and Stockfish evaluation graphs.
+            </p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            <!-- Left Column: Input and Configurations (7 cols) -->
+            <div class="lg:col-span-7 space-y-8">
+                <!-- PGN & Historic Games Panel -->
+                <div class="glass-card rounded-3xl p-8 relative overflow-hidden">
+                    <div class="flex items-center space-x-3 mb-5 pb-3 border-b border-white/5">
+                        <!-- SVG Write Icon -->
+                        <svg class="w-5 h-5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        <h2 class="text-lg font-semibold tracking-wide text-white/90">Game Input (PGN)</h2>
+                    </div>
+                    
+                    <!-- Quick Load Buttons -->
+                    <div class="mb-6">
+                        <label class="text-[10px] text-gray-400 block mb-3 font-semibold tracking-widest uppercase">Load Historic Masterpieces</label>
+                        <div class="flex flex-wrap gap-2.5">
+                            <button onclick="loadHistoricGame('kasparov')" class="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-medium text-gray-300 hover:bg-brand-purple/10 hover:border-brand-purple/30 hover:text-white transition-all duration-200">
+                                Kasparov vs. Deep Blue (1997)
+                            </button>
+                            <button onclick="loadHistoricGame('opera')" class="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-medium text-gray-300 hover:bg-brand-purple/10 hover:border-brand-purple/30 hover:text-white transition-all duration-200">
+                                Morphy's Opera Game (1858)
+                            </button>
+                            <button onclick="loadHistoricGame('carlsen')" class="px-4 py-2 rounded-xl bg-white/5 border border-white/5 text-xs font-medium text-gray-300 hover:bg-brand-purple/10 hover:border-brand-purple/30 hover:text-white transition-all duration-200">
+                                Carlsen vs. Karjakin (2013)
+                            </button>
+                        </div>
+                    </div>
+
+                    <textarea id="pgnInput" placeholder="Paste your PGN chess moves here..." class="w-full h-48 bg-brand-dark/40 border border-white/10 rounded-2xl p-5 text-sm font-mono text-cyan-300 focus:outline-none focus:border-brand-purple/40 focus:ring-1 focus:ring-brand-purple/20 transition-all resize-none shadow-inner leading-relaxed"></textarea>
+                </div>
+
+                <!-- Style Settings Panel -->
+                <div class="glass-card rounded-3xl p-8 space-y-6">
+                    <div class="flex items-center space-x-3 mb-1 pb-3 border-b border-white/5">
+                        <!-- SVG Adjustments Icon -->
+                        <svg class="w-5 h-5 text-brand-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path>
+                        </svg>
+                        <h2 class="text-lg font-semibold tracking-wide text-white/90">Style Configurations</h2>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Aspect Ratio -->
+                        <div>
+                            <label class="text-[10px] text-gray-400 block mb-2 font-semibold tracking-widest uppercase">Video Format (Aspect Ratio)</label>
+                            <div class="grid grid-cols-2 gap-2 bg-brand-dark/50 border border-white/10 p-1.5 rounded-xl">
+                                <button onclick="selectRatio('16:9')" id="ratio169" class="py-2.5 text-xs font-semibold rounded-lg text-white transition-all bg-brand-purple/80 shadow-md">
+                                    YouTube (16:9)
+                                </button>
+                                <button onclick="selectRatio('9:16')" id="ratio916" class="py-2.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all">
+                                    TikTok / Shorts (9:16)
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Piece Set Theme -->
+                        <div>
+                            <label class="text-[10px] text-gray-400 block mb-2 font-semibold tracking-widest uppercase">Piece Set Theme</label>
+                            <select id="pieceTheme" class="w-full bg-brand-dark/50 border border-white/10 rounded-xl p-3 text-xs font-medium text-gray-200 focus:outline-none focus:border-brand-purple/50">
+                                <option value="cburnett">cburnett (Lichess Classic)</option>
+                                <option value="alpha">alpha (Traditional)</option>
+                                <option value="caliente">caliente (Elegant)</option>
+                                <option value="staunty">staunty (Classic Wood)</option>
+                                <option value="dubrovny">dubrovny (Russian Classic)</option>
+                                <option value="fantasy">fantasy (Medieval Style)</option>
+                                <option value="horsey">horsey (Meme Style)</option>
+                                <option value="pixel">pixel (8-Bit Retro)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Chess Board Theme Selector -->
+                        <div>
+                            <label class="text-[10px] text-gray-400 block mb-2.5 font-semibold tracking-widest uppercase">Chess Board Theme</label>
+                            <div class="grid grid-cols-3 gap-2 bg-brand-dark/50 border border-white/10 p-1.5 rounded-xl">
+                                <button onclick="selectTheme('green')" id="theme-green" class="py-2 text-[10px] font-semibold rounded-lg text-white transition-all bg-white/5 border border-brand-purple">
+                                    Green
+                                </button>
+                                <button onclick="selectTheme('wood')" id="theme-wood" class="py-2 text-[10px] font-semibold rounded-lg text-gray-400 hover:text-white transition-all border border-transparent">
+                                    Wood
+                                </button>
+                                <button onclick="selectTheme('blue')" id="theme-blue" class="py-2 text-[10px] font-semibold rounded-lg text-gray-400 hover:text-white transition-all border border-transparent">
+                                    Blue
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Audio Volume Level (Slider Option) -->
+                        <div>
+                            <div class="flex justify-between text-[10px] font-semibold tracking-wider text-gray-400 mb-2 uppercase">
+                                <span class="tracking-widest">Audio Volume Level</span>
+                                <span id="volumeVal" class="text-brand-cyan">400%</span>
+                            </div>
+                            <input type="range" id="audioVolume" min="100" max="1000" step="50" value="400" oninput="document.getElementById('volumeVal').innerText = this.value + '%'" class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-purple mt-2">
+                        </div>
+                    </div>
+
+                    <!-- Engine & Timing Sliders -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-3 border-t border-white/5">
+                        <div>
+                            <div class="flex justify-between text-[10px] font-semibold tracking-wider text-gray-400 mb-2 uppercase">
+                                <span>Stockfish Depth</span>
+                                <span id="depthVal" class="text-brand-cyan">10 plies</span>
+                            </div>
+                            <input type="range" id="stockfishDepth" min="5" max="15" value="10" oninput="document.getElementById('depthVal').innerText = this.value + ' plies'" class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-purple">
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-[10px] font-semibold tracking-wider text-gray-400 mb-2 uppercase">
+                                <span>Move Pause Duration</span>
+                                <span id="durationVal" class="text-brand-cyan">0.8s</span>
+                            </div>
+                            <input type="range" id="holdDuration" min="0.4" max="2.0" step="0.1" value="0.8" oninput="document.getElementById('durationVal').innerText = this.value + 's'" class="w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-brand-purple">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <button onclick="startVideoGeneration()" class="w-full py-4.5 bg-gradient-to-r from-brand-purple via-brand-pink to-brand-blue rounded-2xl font-bold text-base text-white hover:opacity-90 active:scale-[0.98] duration-200 transition-all shadow-xl shadow-brand-purple/10 flex items-center justify-center space-x-3 glow-button">
+                    <!-- SVG Film Icon -->
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z"></path>
+                    </svg>
+                    <span>Generate Chess Video</span>
+                </button>
+            </div>
+
+            <!-- Right Column: Process & Output Video Preview (5 cols) -->
+            <div class="lg:col-span-5">
+                <div class="sticky top-12 space-y-8">
+                    <!-- Progress and Terminal Panel -->
+                    <div id="progressPanel" class="glass-card rounded-3xl p-8 hidden flex flex-col min-h-[520px]">
+                        <div class="flex items-center space-x-3 mb-6 pb-3 border-b border-white/5">
+                            <!-- SVG Lightning Icon -->
+                            <svg class="w-5 h-5 text-brand-cyan" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                            <h2 class="text-lg font-semibold tracking-wide text-white/90">Compilation Progress</h2>
+                        </div>
+
+                        <!-- Progress Bar & Status -->
+                        <div class="mb-6 space-y-3">
+                            <div class="flex justify-between text-xs tracking-wide text-gray-300 font-medium">
+                                <span id="statusLabel">Compiling pipeline...</span>
+                                <span id="progressPercent" class="font-bold text-brand-cyan">0%</span>
+                            </div>
+                            <div class="w-full bg-brand-dark/60 rounded-full h-2 overflow-hidden border border-white/5">
+                                <div id="progressBar" class="bg-gradient-to-r from-brand-cyan to-brand-purple h-2 rounded-full duration-300 transition-all" style="width: 0%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Progress Checklist -->
+                        <div class="space-y-3.5 mb-6">
+                            <div id="step-pgn" class="flex items-center space-x-3.5 text-xs text-gray-400 font-medium">
+                                <span id="step-pgn-icon" class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]">1</span>
+                                <span>Parse PGN game moves</span>
+                            </div>
+                            <div id="step-stockfish" class="flex items-center space-x-3.5 text-xs text-gray-400 font-medium">
+                                <span id="step-stockfish-icon" class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]">2</span>
+                                <span>Analyze positions with Stockfish</span>
+                            </div>
+                            <div id="step-assets" class="flex items-center space-x-3.5 text-xs text-gray-400 font-medium">
+                                <span id="step-assets-icon" class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]">3</span>
+                                <span>Rasterize vector chess pieces</span>
+                            </div>
+                            <div id="step-video" class="flex items-center space-x-3.5 text-xs text-gray-400 font-medium">
+                                <span id="step-video-icon" class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]">4</span>
+                                <span>Compile frames into FFmpeg pipeline</span>
+                            </div>
+                            <div id="step-audio" class="flex items-center space-x-3.5 text-xs text-gray-400 font-medium">
+                                <span id="step-audio-icon" class="w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]">5</span>
+                                <span>Synchronize audio move sounds</span>
+                            </div>
+                        </div>
+
+                        <!-- Live Terminal Console -->
+                        <div class="flex-grow flex flex-col bg-brand-dark/95 border border-white/5 rounded-2xl p-5 shadow-inner min-h-[190px]">
+                            <div class="text-[9px] text-gray-500 font-mono tracking-widest uppercase mb-3 pb-1.5 border-b border-white/5 flex justify-between">
+                                <span>Terminal Output Logger</span>
+                                <span class="animate-pulse text-red-500 font-bold">LIVE</span>
+                            </div>
+                            <div id="terminal" class="flex-grow overflow-y-auto font-mono text-[11px] text-green-400 space-y-1 h-36 max-h-48 leading-relaxed">
+                                <div class="text-gray-500">Waiting for generation job...</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Output Panel (Video Player + Downloads) -->
+                    <div id="outputPanel" class="glass-card rounded-3xl p-8 hidden space-y-6">
+                        <div class="flex items-center space-x-3 pb-3 border-b border-white/5">
+                            <!-- SVG Video Check Icon -->
+                            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <h2 class="text-lg font-semibold tracking-wide text-white/90">Video Output Generated</h2>
+                        </div>
+
+                        <!-- Aspect-ratio container for Video Player -->
+                        <div id="videoContainer" class="w-full bg-brand-dark rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center">
+                            <video id="videoPlayer" controls class="w-full h-auto max-h-[500px] object-contain">
+                                Your browser does not support the video tag.
+                            </video>
+                        </div>
+
+                        <!-- Download & Action Buttons -->
+                        <div class="space-y-3 pt-2">
+                            <a id="downloadBtn" href="#" download class="w-full py-4 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-2xl font-bold text-center text-white block hover:opacity-95 active:scale-[0.98] duration-200 transition-all shadow-lg shadow-emerald-500/10">
+                                Download High-Quality MP4
+                            </a>
+                            <button onclick="resetGenerator()" class="w-full py-3 bg-white/5 border border-white/10 rounded-2xl font-semibold text-xs text-gray-300 hover:bg-white/10 hover:text-white transition-all">
+                                Convert Another PGN
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Welcome Panel (Initially visible before submission) -->
+                    <div id="welcomePanel" class="glass-card rounded-3xl p-8 text-center space-y-6">
+                        <div class="w-16 h-16 bg-brand-purple/10 rounded-2xl flex items-center justify-center mx-auto border border-brand-purple/20">
+                            <!-- SVG Play Circle instead of popcorn emoji -->
+                            <svg class="w-8 h-8 text-brand-purple animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="text-base font-semibold text-white/90">Ready to Compile Your Video</h3>
+                            <p class="text-xs text-gray-400 leading-relaxed max-w-sm mx-auto">
+                                Paste a PGN chess game, customize your themes and volume parameters, and launch the compiler. Telemetry progress will stream in real-time.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Script Section -->
+    <script>
+        // Preset Historic Chess PGNs
+        const presets = {
+            kasparov: `[Event "Kasparov - Deep Blue Rematch"]
+[Site "New York, NY USA"]
+[Date "1997.05.03"]
+[Round "1"]
+[White "Kasparov, Garry"]
+[Black "Deep Blue (Computer)"]
+[Result "1-0"]
+
+1. Nf3 d5 2. g3 Bg4 3. b3 Nd7 4. Bb2 e6 5. Bg2 Ngf6 6. O-O c6 7. d3 Bd6 8. Nbd2 O-O 9. h3 Bh5 10. e3 h6 11. Qe1 Qa5 12. a3 Bc7 13. Nh4 g5 14. Nhf3 e5 15. e4 Rfe8 16. Nh2 Qb6 17. Qc1 a5 18. Re1 Bd6 19. Ndf1 dxe4 20. dxe4 Bc5 21. Ne3 Rad8 22. Nhf1 g4 23. hxg4 Nxg4 24. f3 Nxe3 25. Nxe3 Be7 26. Kh1 Bg5 27. Qe1 a4 28. b4 f6 29. Nf5 Nf8 30. f4 exf4 31. gxf4 Bxf4 32. Bxf6 Rd2 33. Qh4 Rxg2 34. Kxg2 Bf7 35. Qxf4 Ng6 36. Qxh6 1-0`,
+
+            opera: `[Event "A Night at the Opera"]
+[Site "Paris FRA"]
+[Date "1858.11.02"]
+[Round "1"]
+[White "Morphy, Paul"]
+[Black "Duke Karl / Count Isouard"]
+[Result "1-0"]
+
+1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0`,
+
+            carlsen: `[Event "Brilliant Magnus Checkmate"]
+[Site "Wijk aan Zee NED"]
+[Date "2013.01.26"]
+[White "Carlsen, Magnus"]
+[Black "Karjakin, Sergey"]
+[Result "1-0"]
+
+1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 a6 6. Be3 e5 7. Nb3 Be6 8. f3 Be7 9. Qd2 O-O 10. O-O-O Nbd7 11. g4 b5 12. g5 b4 13. Ne2 Ne8 14. f4 a5 15. f5 a4 16. Nbd4 exd4 17. Nxd4 b3 18. Kb1 bxc2+ 19. Nxc2 Bb3 20. axb3 axb3 21. Na3 Ne5 22. h4 Ra5 23. Qc3 Qa8 24. Bg2 Nd7 25. Bd4 Ne5 26. Qxb3 Nc7 27. Bxe5 dxe5 28. Rd7 Bxa3 29. Rxc7 Bd6 30. Rb7 Ra1+ 31. Kc2 Rc8+ 32. Kd2 Qa5+ 33. Ke2 Qa6+ 34. Kf3 Rf8 35. Rxa1 Qxa1 36. g6 Bc5 37. Rxf7 1-0`
+        };
+
+        // State variables
+        let selectedRatio = "16:9";
+        let selectedTheme = "green";
+
+        // Load PGN preset
+        function loadHistoricGame(name) {
+            if (presets[name]) {
+                document.getElementById('pgnInput').value = presets[name];
+            }
+        }
+
+        // Segmented ratio selector toggle
+        function selectRatio(ratio) {
+            selectedRatio = ratio;
+            const btn169 = document.getElementById('ratio169');
+            const btn916 = document.getElementById('ratio916');
+
+            if (ratio === "16:9") {
+                btn169.className = "py-2.5 text-xs font-semibold rounded-lg text-white transition-all bg-brand-purple/80 shadow-md";
+                btn916.className = "py-2.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all";
+            } else {
+                btn916.className = "py-2.5 text-xs font-semibold rounded-lg text-white transition-all bg-brand-purple/80 shadow-md";
+                btn169.className = "py-2.5 text-xs font-semibold rounded-lg text-gray-400 hover:text-white transition-all";
+            }
+        }
+
+        // Board theme selector highlights
+        function selectTheme(theme) {
+            selectedTheme = theme;
+            const themes = ['green', 'wood', 'blue'];
+            themes.forEach(t => {
+                const btn = document.getElementById(`theme-${t}`);
+                if (t === theme) {
+                    btn.className = "py-2 text-[10px] font-semibold rounded-lg text-white transition-all bg-white/5 border border-brand-purple";
+                } else {
+                    btn.className = "py-2 text-[10px] font-semibold rounded-lg text-gray-400 hover:text-white transition-all border border-transparent";
+                }
+            });
+        }
+
+        // Reset panels
+        function resetGenerator() {
+            document.getElementById('outputPanel').classList.add('hidden');
+            document.getElementById('welcomePanel').classList.remove('hidden');
+            document.getElementById('progressPanel').classList.add('hidden');
+        }
+
+        // Log to terminal
+        function logToTerminal(msg, colorClass = "text-green-400") {
+            const terminal = document.getElementById('terminal');
+            const line = document.createElement('div');
+            line.className = colorClass;
+            line.innerText = `> ${msg}`;
+            terminal.appendChild(line);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        // Clear terminal logs
+        function clearTerminal() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = "";
+        }
+
+        // Reset checklists
+        function resetChecklist() {
+            const steps = ['pgn', 'stockfish', 'assets', 'video', 'audio'];
+            steps.forEach(s => {
+                const icon = document.getElementById(`step-${s}-icon`);
+                icon.className = "w-5 h-5 rounded-full border border-white/10 flex items-center justify-center text-[10px]";
+                icon.innerHTML = steps.indexOf(s) + 1;
+                document.getElementById(`step-${s}`).className = "flex items-center space-x-3.5 text-xs text-gray-400 font-medium";
+            });
+        }
+
+        // Update checklists items on triggers
+        function updateChecklistItem(step, status) {
+            const icon = document.getElementById(`step-${step}-icon`);
+            const container = document.getElementById(`step-${step}`);
+            
+            if (status === 'processing') {
+                icon.className = "w-5 h-5 rounded-full border border-brand-cyan/40 bg-brand-cyan/10 flex items-center justify-center text-[10px] text-brand-cyan animate-pulse";
+                container.className = "flex items-center space-x-3.5 text-xs text-brand-cyan font-semibold";
+            } else if (status === 'done') {
+                icon.className = "w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] border border-emerald-500 shadow-md shadow-emerald-500/10";
+                icon.innerHTML = "Y";
+                container.className = "flex items-center space-x-3.5 text-xs text-emerald-400 font-medium";
+            }
+        }
+
+        // Start generation process
+        async function startVideoGeneration() {
+            const pgn = document.getElementById('pgnInput').value.trim();
+            if (!pgn) {
+                alert("Please enter or load a chess PGN game first!");
+                return;
+            }
+
+            // UI shifts
+            document.getElementById('welcomePanel').classList.add('hidden');
+            document.getElementById('outputPanel').classList.add('hidden');
+            document.getElementById('progressPanel').classList.remove('hidden');
+            
+            clearTerminal();
+            resetChecklist();
+            logToTerminal("Starting compilation worker thread...", "text-brand-cyan");
+
+            const pieceTheme = document.getElementById('pieceTheme').value;
+            const stockfishDepth = parseInt(document.getElementById('stockfishDepth').value);
+            const holdDuration = parseFloat(document.getElementById('holdDuration').value);
+            const audioVolume = parseFloat(document.getElementById('audioVolume').value) / 100.0;
+
+            // POST request to FastAPI
+            try {
+                const res = await fetch('/api/generate', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        pgn: pgn,
+                        board_theme: selectedTheme,
+                        piece_theme: pieceTheme,
+                        aspect_ratio: selectedRatio,
+                        hold_duration: holdDuration,
+                        volume: audioVolume
+                    })
+                });
+
+                if (!res.ok) {
+                    const err = await res.json();
+                    throw new Error(err.detail || "Server request failed.");
+                }
+
+                const data = await res.json();
+                const taskId = data.task_id;
+                logToTerminal(`Task enqueued successfully! ID: ${taskId}`, "text-gray-400");
+                
+                // Connect WebSocket
+                connectWebSocket(taskId);
+
+            } catch (err) {
+                logToTerminal(`Generation failed: ${err.message}`, "text-red-500 font-bold");
+                alert(`Error enqueuing task: ${err.message}`);
+            }
+        }
+
+        // Connect WebSocket
+        function connectWebSocket(taskId) {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.host}/ws/${taskId}`;
+            const ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                logToTerminal("WebSocket telemetry channel opened successfully.", "text-gray-500");
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                const progress = data.progress;
+                const message = data.message;
+                const status = data.status;
+
+                // Update Progress bar
+                document.getElementById('statusLabel').innerText = message;
+                document.getElementById('progressPercent').innerText = `${progress}%`;
+                document.getElementById('progressBar').style.width = `${progress}%`;
+
+                // Log to terminal
+                logToTerminal(message, status === 'failed' ? "text-red-400" : (status === 'completed' ? "text-emerald-400 font-semibold" : "text-green-400"));
+
+                // Checklist progress triggers
+                if (progress >= 5 && progress < 10) {
+                    updateChecklistItem('pgn', 'processing');
+                } else if (progress >= 10 && progress < 55) {
+                    updateChecklistItem('pgn', 'done');
+                    updateChecklistItem('stockfish', 'processing');
+                } else if (progress >= 55 && progress < 60) {
+                    updateChecklistItem('stockfish', 'done');
+                    updateChecklistItem('assets', 'processing');
+                } else if (progress >= 60 && progress < 92) {
+                    updateChecklistItem('assets', 'done');
+                    updateChecklistItem('video', 'processing');
+                } else if (progress >= 92 && progress < 100) {
+                    updateChecklistItem('video', 'done');
+                    updateChecklistItem('audio', 'processing');
+                } else if (progress === 100) {
+                    updateChecklistItem('audio', 'done');
+                }
+
+                // Completion
+                if (status === 'completed' && data.video_url) {
+                    logToTerminal(`Video rendering finalized! File served at: ${data.video_url}`, "text-emerald-400 font-bold");
+                    showOutputVideo(data.video_url);
+                    ws.close();
+                } else if (status === 'failed') {
+                    ws.close();
+                }
+            };
+
+            ws.onerror = (err) => {
+                logToTerminal("WebSocket telemetry channel encountered an error.", "text-red-500");
+            };
+
+            ws.onclose = () => {
+                logToTerminal("WebSocket telemetry channel closed.", "text-gray-500");
+            };
+        }
+
+        // Show Output Video Player
+        function showOutputVideo(videoUrl) {
+            document.getElementById('progressPanel').classList.add('hidden');
+            document.getElementById('outputPanel').classList.remove('hidden');
+
+            const player = document.getElementById('videoPlayer');
+            const container = document.getElementById('videoContainer');
+            const downloadBtn = document.getElementById('downloadBtn');
+
+            player.src = videoUrl;
+            downloadBtn.href = videoUrl;
+            
+            // Adjust player max width on portrait format
+            if (selectedRatio === "9:16") {
+                container.className = "w-full max-w-[280px] bg-brand-dark rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center mx-auto";
+            } else {
+                container.className = "w-full bg-brand-dark rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex items-center justify-center mx-auto";
+            }
+            
+            player.load();
+        }
+
+        // Preload kasparov game
+        loadHistoricGame('kasparov');
+    </script>
+</body>
+</html>
