@@ -241,7 +241,7 @@ ChessForAli/
 **Ali Nasser (Ali Al-Khazali)**
 - Portfolio: [www.ali-nasser.dev](https://www.ali-nasser.dev)
 - GitHub: [@a360n](https://github.com/a360n)
-- LinkedIn: [Ali Nasser](https://linkedin.com/in/alinasser)
+- LinkedIn: [Ali Nasser](https://www.linkedin.com/in/ali-nasser-dev/)
 
 ---
 
